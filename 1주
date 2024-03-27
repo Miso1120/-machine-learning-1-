@@ -1,0 +1,71 @@
+bream_length = [25.4, 26.3,26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7,
+31.0, 31.0, 31.5, 32.0, 32.0, 32.0, 33.0, 33.0, 33.5, 33.5,
+34.0, 34.0, 34.5, 35.0, 35.0, 35.0, 35.0,36.0, 36.0, 37.0,
+38.5, 38.5, 39.5, 41.0, 41.0]
+
+bream_weight = [242.0, 290.0, 340.0, 363.0, 430.0, 450.0, 500.0, 390.0,
+ 450.0, 500.0, 475.0, 500.0, 500.0, 340.0, 600.0, 600.0,
+ 700.0, 700.0, 610.0, 650.0, 575.0, 685.0, 620.0, 680.0,
+700.0, 725.0, 720.0, 714.0, 850.0, 1000.0, 920.0, 955.0,
+925.0, 975.0, 950.0]
+
+도미의 길이, 무게와 같이 특징을 표현한 것을 '특성'이라 한다.
+위 리스트를 각 x축 y축 그래프에 점으로 표현한 것을 '산점도'라 한다.
+이 그래프를 그리는 대표적 패키지는 '맷플롭립(matplotlib)'
+-> import로 불러보자
+
+import matplotlib.pyplot as plt
+plt.scatter(bream_length, bream_weight)
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+smelt_length = [9.8, 10.5, 10.6, 11.0, 11.2, 11.3, 11.8, 11.8, 12.0, 12.2,
+                12.4, 13.0, 14.3, 15.0]
+smelt_weight = [6.7, 7.5, 7.0, 9.7, 9.8, 8.7, 10.0, 9.9, 9.8, 12.2, 13.4,
+                12.2, 19.7, 19.9]
+
+plt.scatter(bream_length, bream_weight)
+plt.scatter(smelt_length, smelt_weight)
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+length = bream_length + smelt_length
+weight = bream_weight + smelt_weight
+이렇게 도미와 빙어의 길이, 무게를 각각 합친 후, 이 리스트를 세로로 늘어뜨린 2차원 리스트를 만들거임
+가장 쉬운 방법 : zip()함수와 리스트 내포 구문을 사용하는 것
+zip()함수는 나열된 리스트 각각에서 하나씩 원소를 꺼내서 반환한다.
+
+fish_data = [[l,w] for l, w in zip(length, weight)]
+print(fish_data)
+
+리스트 데이터 준비 완료! 다음으로 필요한 것은 '정답 데이터' / 정답 데이터를 위해서는 규칙을 만들어야 한다.
+그러려면 일단 무슨 생선이 도미인지 빙어인지를 알려줘야 함 -> 도미를[1], 빙어를[0]으로 표현해서 컴퓨터에게 알려줄 것임. 곱셈 연산자 사용해서 그냥 숫자 기입할거임
+
+fish_target = [1]*35 +[0]*14
+print(fish_target)
+
+이제 이 fish_target을 fish_data에 묶어서 fish_data 자료를 도미와 빙어로 구분할 것이다.
+그러기 위해선 KNeighborsClassfier 를 import 해줄거임
+
+from sklearn.neighbors import KNeighborsClassifier
+kn = KNeighborsClassifier()
+kn.fit(fish_data, fish_target)
+kn.score(fish_data, fish_target)
+이제 그러면 아무 숫자나 넣어서 도미와 빙어 중 어떤 곳에 속할지 예측할 수 있음
+kn.predict([[10, 10]])
+
+이렇게 데이터만 준비한다면 k-최근접 이웃 알고리즘으로 새로운 데이터를 예측할 수 있다!
+다만, 데이터가 아~주 많은 경우 사용하기 어렵다.
+이유는 데이터가 크기 때문에 메모리 소모가 크고, 새로운 데이터를 예측할 시 데이터 간의 직선거리 계산하는데 걸리는 소요 시간이 많기 때문이다.
+
+print(kn._fit_X)
+print(kn._y)
+즉, k-최근접 이웃 알고리즘은 사실상 훈련된게 없는 셈이다!!
+우리가 fit()에 넣은 데이터를 가지고 있다가 새로운 데이터를 입력하면 그 데이터와 가까운 데이터를 참고해서 도미인지 빙어인지 구분해주는 것!
+
+kn49 = KNeighborsClassifier(n_neighbors=49)
+
+
+
